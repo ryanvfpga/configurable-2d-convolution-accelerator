@@ -58,20 +58,21 @@ module convolution (
 
     end
 
-    always @(posedge clk) begin
-        if(rst)
-            pixel_out <= 0;
-
-        else if (shift_en) begin
-            if(temp_sum > 21'sd255)
-                pixel_out <= 21'd255;
-            else if(temp_sum < 21'sd0)
-                pixel_out <= 21'd0;
-            else
-                pixel_out <= temp_sum[7:0];
-        end
+    reg signed [20:0] abs_sum;
+    always @(*) begin
+        abs_sum = (temp_sum < 0) ? -temp_sum : temp_sum;
     end
 
+    always @(posedge clk) begin
+        if(rst) begin
+            pixel_out <= 0;
+        end else if (shift_en) begin
+            if(abs_sum > 21'sd255)
+                pixel_out <= 8'd255;
+            else
+                pixel_out <= abs_sum[7:0];
+        end
+    end
 
 
     always @(posedge clk) begin
