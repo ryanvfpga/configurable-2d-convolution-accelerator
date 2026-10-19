@@ -7,7 +7,8 @@ module convolution (
     output reg [7:0] pixel_out,
     input [7:0] shift_amount,
     input valid,
-    output reg valid_out
+    output reg valid_out,
+    input abs_en
 );
 
     reg v1, v2, v3;
@@ -53,14 +54,17 @@ module convolution (
             sum_row0 <= (mul00 + mul01 + mul02);
             sum_row1 <= (mul10 + mul11 + mul12);
             sum_row2 <= (mul20 + mul21 + mul22);
-            temp_sum <= (sum_row0 + sum_row1 + sum_row2)  >> shift_amount;
+            temp_sum <= (sum_row0 + sum_row1 + sum_row2)  >>> shift_amount;
         end
 
     end
 
     reg signed [20:0] abs_sum;
     always @(*) begin
-        abs_sum = (temp_sum < 0) ? -temp_sum : temp_sum;
+        if(abs_en)
+            abs_sum = (temp_sum < 0) ? -temp_sum : temp_sum;
+        else
+            abs_sum = temp_sum;
     end
 
     always @(posedge clk) begin
