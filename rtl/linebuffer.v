@@ -4,7 +4,7 @@ module linebuffer(
     input rst,
     input clk,
     input shift_en
-)
+);
 
 reg [7:0] line_buf_bram [0:126];
 reg [6:0] addr_ptr;
@@ -22,5 +22,4 @@ always @(posedge clk) begin
 
 end
 
-
-
+endmodule

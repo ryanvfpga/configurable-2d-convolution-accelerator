@@ -27,7 +27,7 @@ wire [7:0] l2_pixel_out;
 linebuffer l1 (.clk(clk), .rst(rst), .shift_en(shift_en), .pixel_in(pixel_in), .pixel_out(l1_pixel_out));
 linebuffer l2 (.clk(clk), .rst(rst), .shift_en(shift_en), .pixel_in(l1_pixel_out), .pixel_out(l2_pixel_out));
 
-reg [7:0] p00, p01, p02, p10, p11, p12, p20, p21, p22;
+
 
 
 always @(posedge clk) begin
