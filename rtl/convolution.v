@@ -13,9 +13,9 @@ module convolution (
 
     reg v1, v2, v3;
 
-    reg signed [16:0] mul00, mul01, mul02;
-    reg signed [16:0] mul10, mul11, mul12;
-    reg signed [16:0] mul20, mul21, mul22;
+    (* use_dsp = "yes" *) reg signed [16:0] mul00, mul01, mul02;
+    (* use_dsp = "yes" *) reg signed [16:0] mul10, mul11, mul12;
+    (* use_dsp = "yes" *) reg signed [16:0] mul20, mul21, mul22;
 
     reg signed [20:0] temp_sum;
     reg signed [18:0] sum_row0, sum_row1, sum_row2;
