@@ -127,6 +127,6 @@ Some example test images are given in `images/`
 
 - Work on boundary pixel replication or ways to ensure that output image size remains same as input image size.
 - Remove hardcoded 128x128 limit, and make it fully parameterizable to support any image size.
-- 
+
 
 
