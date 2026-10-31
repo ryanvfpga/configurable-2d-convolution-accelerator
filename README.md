@@ -2,13 +2,24 @@
 
 A streaming $3 \times 3$ 2D image convolution accelerator implemented in Verilog HDL. Designed to process $128 \times 128$ 8-bit grayscale image frames with configurable signed kernel weights and dynamic bit-shift scaling.
 
+## Examples
+
+Input and outputs for the same 128×128 image:
+
+| Original | Gaussian blur | Sobel X | Sobel Y |
+|:---:|:---:|:---:|:---:|
+| <img src="./images/image2.png" alt="Original grayscale input" width="200"/> | <img src="./docs/image2_gaussianblur.png" alt="Gaussian blur output" width="200"/> | <img src="./docs/image2_sobelx.png" alt="Sobel X edge output" width="200"/> | <img src="./docs/image2_sobely.png" alt="Sobel Y edge output" width="200"/> |
+
+
 ## Features
 
 - BRAM based circular line buffer to maintain sliding 3x3 window over streaming pixels.
 - Accepts 8 configurable 8-bit signed kernel weights through top level port, supporting dynamic reconfiguration.
-- Dynamic scaling through *shift_amount*, for gain normalization in filters like gaussian.
+- Dynamic scaling through `shift_amount`, for gain normalization in filters like gaussian.
 
 - Fully pipelined spatial multiply-accumulate (MAC) datapath and adder tree, achieving timing closure at 160 MHz on a Xilinx Zynq-7020 FPGA.
+
+
 
 ## Architecture
 
@@ -16,20 +27,23 @@ A streaming $3 \times 3$ 2D image convolution accelerator implemented in Verilog
 
 
 
-The design has two modules, `window_gen` and `convolution`, joined in `top`.
+The design has two modules, window_gen.v and convolution.v, joined in top.v.
 
-**Window generation (`window_gen`)**
-- Two line buffers, each delaying the pixel stream by one image row (128 pixels), are chained so the current row and the two rows above it are available together.
-- A 3×3 grid of registers (`p00` to `p22`) shifts the three rows sideways, so a full 3×3 window is ready every clock.
-- Row and column counters track the position in the frame and drive `valid`. It drives low, at times of boundary/corner pixels thus making the output 126x126.
+**Window generation (window_gen.v)**
 
-**Convolution (`convolution`)**
+Two line buffers 128 deep, hold the past 2 rows of the image while we receieve the current pixel, the line buffers and pixel_in connect to a 3x3 grid of registers which creates a 3x3 convolution window.
 
-  1. `mul`: multiply each of the nine window pixels by its kernel weight and register it.
-  2. `sum_row`: add the three products in each row.
-  3. `temp_sum`: add the three row sums and apply the `shift_amount` scaling.
+The window counters count rows and columns, to detect pixels which are near the boundary or those whose convolution window does not lie entirely within the 128x128 image, in those cases valid is driven down for that pixel so the output can be discarded for that pixel, Hence, for a 128x128 input we get a 126x126 output.
+
+
+**Convolution (convolution.v)**
+
+  1. `mul00 - mul22`: multiply each of the nine window pixels by its kernel weight and register it.
+  2. `sum_row0 - sum_row2`: add the three products in each row and register it..
+  3. `temp_sum`: add the three row sums, apply `shift_amount` scaling and register it.
   4. `pixel_out`: take the optional absolute value (`abs_en`), saturate to 255 and register the result.
 
+The valid signal is also pipelined, so it is registered at `valid_out` at the same time as its corresponding pixel is registered at `pixel_out`
 
 ## Utilization and Timing
 
@@ -63,7 +77,7 @@ cd configurable-2d-convolution-accelerator/
 
 ### Prerequisites
 
-* **Icarus Verilog (`iverilog`)**
+* **Icarus Verilog (iverilog)**
 * **Python 3** with **Pillow**:
 
 ```bash
@@ -72,13 +86,13 @@ pip install pillow
 
 ### Running the simulation
 
-Run the script from the repository root, passing the path to any image:
+Run the script from the repository root, passing the path to any image, (run_sim.py executes all (filters) in `tb/`)
 
 ```bash
 python run_sim.py images/image1.png
 ```
 
-The script converts the image to 128×128 grayscale and then simulates three filters in turn: Sobel X, Sobel Y and Gaussian blur. Each result is saved as a 126×126 PNG in an `output/` folder next to the input image:
+The script converts the image to 128×128 grayscale and then simulates all filters in `tb/`: Sobel X, Sobel Y and Gaussian blur. Each result is saved as a 126×126 PNG in an `output/` folder next to the input image:
 
 ```
 images/output/image1_sobelx.png
@@ -86,6 +100,8 @@ images/output/image1_sobely.png
 images/output/image1_gaussianblur.png
 ```
 
-Intermediate hex files and compiled simulations go in `build/`.
+You can modify the filters, by creating your own file in `tb/` and passing your kernel weights, as well as other parameters like shift_amount and abs_en.
 
-The testbenches live in `tb/` and the RTL in `rtl/`. Because the script uses relative paths, run it from the repository root.
+Some example test images are given in `images/`
+
+
