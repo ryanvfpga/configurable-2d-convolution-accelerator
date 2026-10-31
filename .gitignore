@@ -1,2 +1,10 @@
 build/
 images/output/
+*.xpr
+*.cache
+*.hw
+*.runs
+*.srcs
+*.ioplanning
+*.sim
+*.ip_user_files
