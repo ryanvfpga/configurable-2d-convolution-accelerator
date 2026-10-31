@@ -13,8 +13,8 @@ reg [6:0] col_count;
 
 always @(posedge clk) begin
     if(rst) begin
-        row_count <= 7'b0;
-        col_count <= 7'b0;
+        row_count <= 7'd127;
+        col_count <= 7'd127;
     end else if(shift_en) begin
         col_count <= (col_count == 7'd127) ? 7'b0 : col_count + 1'b1;
         row_count <= (col_count == 7'd127) ? row_count + 1'b1 : row_count;
