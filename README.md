@@ -17,7 +17,7 @@ Input and outputs for the same 128×128 image:
 - Accepts 8 configurable 8-bit signed kernel weights through top level port, supporting dynamic reconfiguration.
 - Dynamic scaling through `shift_amount`, for gain normalization in filters like gaussian.
 
-- Fully pipelined spatial multiply-accumulate (MAC) datapath and adder tree, achieving timing closure at 160 MHz on a Xilinx Zynq-7020 FPGA.
+- Fully pipelined spatial multiply-accumulate (MAC) datapath and adder tree, achieving timing closure at **160 MHz** on a Xilinx Zynq-7020 FPGA.
 
 
 
